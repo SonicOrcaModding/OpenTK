@@ -167,59 +167,7 @@ namespace OpenTK
         #if SDL2
         private static bool DetectSdl2()
         {
-            bool supported = false;
-
-            // Detect whether SDL2 is supported
-            // We require:
-            // - SDL2 version 2.0.0 or higher (previous beta
-            //   versions are not ABI-compatible)
-            // - Successful SDL2 initialization (sometimes the
-            //   binary exists but fails to initialize correctly)
-            var version = new Platform.SDL2.Version();
-            try
-            {
-                version = Platform.SDL2.SDL.Version;
-                if (version.Number >= 2000)
-                {
-                    if (Platform.SDL2.SDL.WasInit(0))
-                    {
-                        supported = true;
-                    }
-                    else
-                    {
-                        // Attempt to initialize SDL2.
-                        var flags =
-                            Platform.SDL2.SystemFlags.VIDEO |
-                            Platform.SDL2.SystemFlags.TIMER;
-
-                        if (Platform.SDL2.SDL.Init(flags) == 0)
-                        {
-                            supported = true;
-                        }
-                        else
-                        {
-                            Debug.Print("SDL2 init failed with error: {0}",
-                                Platform.SDL2.SDL.GetError());
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Print("SDL2 init failed with exception: {0}", e);
-            }
-
-            if (!supported)
-            {
-                Debug.Print("SDL2 is not supported");
-            }
-            else
-            {
-                Debug.Print("SDL2 is supported. Version is {0}.{1}.{2}",
-                    version.Major, version.Minor, version.Patch);
-            }
-
-            return supported;
+            return false;
         }
         #endif
 
@@ -240,7 +188,12 @@ namespace OpenTK
                     break;
 
                 case "Darwin":
-                    macos = unix = true;
+                    // Patched for the S2HD iOS port: the kernel reports
+                    // "Darwin" on iOS too, which OpenTK would otherwise
+                    // mistake for macOS and try to initialize NSApplication
+                    // (AppKit), which does not exist on iOS.
+                    unix = true;
+                    macos = false;
                     break;
 
                 default:

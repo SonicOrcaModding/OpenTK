@@ -394,9 +394,7 @@ namespace OpenTK.Platform.Egl
         {
             get
             {
-                try { GetCurrentContext(); }
-                catch (Exception) { return false;  }
-                return true;
+                return false;
             }
         }
     }
